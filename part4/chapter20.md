@@ -22,7 +22,9 @@
 
 대형 FASTQ, BAM, CRAM 업로드의 기본 방식은 S3 multipart upload다. 이 방식 자체는 효율적이지만, 업로드가 중간에 실패하거나 파이프라인이 멈추면 완성되지 않은 part가 S3에 남을 수 있다. 문제는 사용자가 파일이 "아직 없다"고 느껴도, 저장 비용은 이미 발생하고 있다는 점이다. 이 때문에 incomplete multipart upload는 대규모 오믹스 프로젝트에서 대표적인 `보이지 않는 비용`이 된다. 파일이 눈에 잘 보이지 않아도 바이트는 이미 남아 있기 때문이다.
 
-AWS는 이를 줄이기 위해 `AbortIncompleteMultipartUpload` lifecycle rule을 제공한다. 교육용으로는 `7일 뒤 미완료 업로드 자동 중단` 같은 정책을 기본값처럼 가르치는 것이 좋다. 학생이 배워야 할 핵심은 간단하다. `완성되지 않은 파일도 비용을 만든다.` 따라서 업로드 실패가 잦거나, 샘플 반입 파이프라인이 길거나, 외부 기관이 데이터를 자주 전달하는 환경일수록 이 규칙은 사실상 필수다. 비용 최적화는 화려한 절약 기술보다 먼저 이런 기본 hygiene에서 시작한다.
+AWS는 이를 줄이기 위해 `AbortIncompleteMultipartUpload` lifecycle rule을 제공한다. 교육용으로는 `7일 뒤 미완료 업로드 자동 중단` 같은 정책을 기본값처럼 가르치는 것이 좋다. 완성되지 않은 파일도 비용을 만든다는 점이 핵심이다. 따라서 업로드 실패가 잦거나, 샘플 반입 파이프라인이 길거나, 외부 기관이 데이터를 자주 전달하는 환경일수록 이 규칙은 사실상 필수다. 비용 최적화는 화려한 절약 기술보다 먼저 이런 기본 hygiene에서 시작한다.
+
+실제 현장에서 이 문제가 얼마나 자주 발생하는지는 외부 엔지니어링 문서에서도 확인할 수 있다. AWS Storage Blog의 ["Discovering and deleting incomplete multipart uploads to lower Amazon S3 costs"](https://aws.amazon.com/blogs/storage/discovering-and-deleting-incomplete-multipart-uploads-to-lower-amazon-s3-costs/)는 ListMultipartUploads API로 잔존 part를 찾아내고 lifecycle로 정리하는 절차를 설명한다. Corey Quinn은 Last Week in AWS에서 ["Quieting Noisy Multipart Upload Costs"](https://www.lastweekinaws.com/blog/quieting-noisy-multipart-upload-costs/) 같은 글로 이 문제를 "S3 청구서에서 가장 많이 간과되는 항목"이라고 반복해서 지적한다. 또 AWS Config 관리형 규칙 [`s3-lifecycle-policy-check`](https://docs.aws.amazon.com/config/latest/developerguide/s3-lifecycle-policy-check.html)나 [`s3-version-lifecycle-policy-check`](https://docs.aws.amazon.com/config/latest/developerguide/s3-version-lifecycle-policy-check.html)는 이런 정책이 버킷에 실제로 설정되어 있는지를 계정 차원에서 감시할 수 있게 해 준다. 유전체 연구실이 수십 수백 TB를 다루기 시작하면, 이 작은 규칙 하나가 매달 눈에 띄는 청구서 차이를 만든다.
 
 ## Small object, random access, request cost
 

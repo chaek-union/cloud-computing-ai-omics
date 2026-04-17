@@ -24,6 +24,24 @@ Amazon EC2는 AWS에서 가장 기본적인 계산 서비스다. 가장 단순�
 
 AWS 인스턴스 이름에서 가장 먼저 볼 것은 패밀리(family)다. `m`은 general purpose, `c`는 compute optimized, `r`은 memory optimized, `i`나 `d` 계열은 storage optimized, `f`는 FPGA 같은 가속기를 쓰는 accelerated computing, `hpc`는 긴밀한 병렬 통신이 필요한 high-performance computing 계열로 이해할 수 있다. 그 뒤의 숫자는 세대(generation), 마지막 크기 표시는 인스턴스 크기(size)를 뜻한다. 따라서 `r7i.4xlarge` 같은 이름을 보면, 최신 세대의 메모리 중심 인스턴스라는 사실부터 파악하면 된다. 이 책에서 중요한 것은 모든 이름을 외우는 일이 아니라, 이름에서 의도를 읽는 감각을 기르는 일이다 (AWS 2024a).
 
+세대와 접미사까지 함께 읽으면 정보가 훨씬 풍부해진다. `c5`는 Xeon 기반의 5세대 compute optimized, `c6i`는 Intel Ice Lake 기반의 6세대, `c6a`는 AMD EPYC 기반의 6세대, `c6g`는 AWS Graviton2 기반, `c7g`는 Graviton3, `c8g`는 Graviton4 기반 최신 세대를 뜻한다. 접미사 `i`는 Intel, `a`는 AMD, `g`는 Graviton이라는 프로세서 종류를 가리키고, 여기에 다시 붙는 `d`는 NVMe 로컬 SSD(instance store)를, `n`은 네트워크 대역폭 강화를, `e`는 메모리 확장을 의미한다. 따라서 `c8gd.8xlarge`는 `Graviton4 기반 compute optimized, 로컬 NVMe 포함, 8xlarge 크기`라고 한 문장으로 풀어 읽을 수 있다. 같은 논리로 `r7iz`는 `Ice Lake 기반 메모리 최적화에 고주파(z) 변형`, `m7a.xlarge`는 `AMD 기반 7세대 general purpose`로 읽힌다.
+
+크기 표시도 규칙적이다. `large`, `xlarge`, `2xlarge`, `4xlarge`, `8xlarge`, `12xlarge`, `16xlarge`, `24xlarge`, `48xlarge`, `metal` 순으로 vCPU와 메모리가 대체로 두 배씩 늘어난다. 같은 `c7g` 안에서 `c7g.large`(2 vCPU / 4 GiB)부터 `c7g.16xlarge`(64 vCPU / 128 GiB)까지 스펙이 선형적으로 확장되므로, 우선 패밀리와 세대를 고르고 나서 크기만 필요에 맞게 고르면 된다. 오믹스 분석에서는 인스턴스를 고를 때 구체적인 이름이 곧 예산과 병목을 결정하므로, 다음 Table 1-1처럼 최근 세대의 대표 선택지를 머릿속에 하나씩 갖고 있는 편이 실용적이다.
+
+Table 1-1. 2026년 기준 compute optimized 계열 대표 예시
+
+| 이름 | 프로세서 | 로컬 SSD | 대표 크기 | 오믹스에서 자주 쓰는 맥락 |
+|---|---|---|---|---|
+| `c5.9xlarge` | Intel Xeon (5세대) | 없음 | 36 vCPU / 72 GiB | 기존 파이프라인 호환, 레거시 워크로드 |
+| `c6i.8xlarge` | Intel Ice Lake | 없음 | 32 vCPU / 64 GiB | 표준 variant calling, bwa, GATK |
+| `c6a.16xlarge` | AMD EPYC | 없음 | 64 vCPU / 128 GiB | CPU 집약 Batch, 가격 대비 CPU 시간 |
+| `c7g.16xlarge` | AWS Graviton3 | 없음 | 64 vCPU / 128 GiB | ARM 빌드 가능한 최신 툴 (samtools, bcftools) |
+| `c7gd.8xlarge` | Graviton3 | NVMe SSD 2×1.9 TB | 32 vCPU / 64 GiB | 정렬 sort, shard 기반 scratch |
+| `c8g.24xlarge` | Graviton4 | 없음 | 96 vCPU / 192 GiB | 최신 대규모 CPU 병렬 작업 |
+| `c8gd.16xlarge` | Graviton4 | 로컬 NVMe 포함 | 64 vCPU / 128 GiB | 최신 scratch-heavy 정렬·sort |
+
+메모리형(`r6i`, `r7g`, `r8g`, `r7iz`)이나 storage-optimized(`i4i`, `i7ie`, `i8g`, `im4gn`, `is4gen`), 범용(`m6i`, `m7g`, `m8g`)도 같은 규칙으로 읽으면 된다. 예를 들어 Hail joint genotyping처럼 메모리 압박이 큰 작업에는 `r7iz.32xlarge`(고주파 Xeon, 128 vCPU / 1,024 GiB)가, sort 중간 파일이 많은 정렬 워크플로에는 로컬 NVMe가 붙은 `i7ie.6xlarge`나 `c8gd.8xlarge`가 자연스럽다. 반대로 "뭘 골라야 할지 모르겠다"는 상황에서는 `m` 계열 최신 세대(`m8g.xlarge` 같은 것)를 기본값으로 두고, 실제 실행 로그를 보면서 병목을 확인한 뒤 `c`·`r`·`i`로 바꿔 나가는 편이 안전하다. 실제 구체 인스턴스 종류와 온디맨드 가격은 AWS EC2 Instance Types 페이지에서 최신 목록을 확인할 수 있다 (AWS 2024a).
+
 ## 오믹스 분석용 컴퓨트 선택 - 메모리형, CPU형, IO형, 가속형
 
 오믹스 분석에서 인스턴스를 고를 때 초급자가 가장 흔히 하는 실수는 "일단 큰 서버면 좋다"라고 생각하는 것이다. 실제로는 CPU가 병목인지, 메모리가 병목인지, 로컬 디스크 I/O가 병목인지, 아니면 특정 가속기를 쓸 수 있는지에 따라 선택이 달라져야 한다. 예를 들어 정렬과 일반적인 variant calling은 CPU 사용량이 높고 샘플 단위 병렬화가 쉬우므로 `c` 계열이 잘 맞는 경우가 많다. 반대로 Hail aggregation, joint genotyping, 대형 annotation join처럼 메모리 압박이 큰 단계는 `r` 계열이 더 자연스럽다. Notebook 기반 탐색이나 가벼운 분석 서버는 `m` 계열로도 충분한 경우가 많다.
