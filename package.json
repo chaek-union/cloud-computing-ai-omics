@@ -1,0 +1,13 @@
+{
+  "name": "cloud-computing-ai-omics",
+  "version": "1.0.0",
+  "description": "AI와 오믹스 연구를 위한 AWS 클라우드 컴퓨팅",
+  "dependencies": {
+    "honkit": "^6.1.4",
+    "honkit-plugin-mermaid": "^0.1.4"
+  },
+  "scripts": {
+    "build": "honkit build",
+    "serve": "honkit serve"
+  }
+}

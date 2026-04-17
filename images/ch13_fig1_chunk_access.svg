@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 540" font-family="'Amazon Ember','Noto Sans KR','Helvetica Neue',sans-serif">
+  <!--
+    AWS palette:
+      Storage Green #7AA116 (good path) | Warning Red #D13212 (bad path)
+      Anchor Blue #146EB4 (process) | Squid Ink #232F3E (text/borders)
+  -->
+  <style>
+    .title { font-size: 18px; font-weight: 700; fill: #232F3E; }
+    .panel { font-size: 15px; font-weight: 700; }
+    .item  { font-size: 13px; fill: #232F3E; }
+    .note  { font-size: 12px; fill: #545B64; font-style: italic; }
+    .bad   { font-size: 12px; fill: #8B1C00; font-weight: 600; }
+    .good  { font-size: 12px; fill: #4F6B0C; font-weight: 600; }
+    .arrowR{ stroke: #D13212; stroke-width: 2; fill: none; marker-end: url(#ar); }
+    .arrowG{ stroke: #7AA116; stroke-width: 2; fill: none; marker-end: url(#ag); }
+    .cap   { font-size: 12px; fill: #545B64; text-anchor: middle; }
+  </style>
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#D13212"/>
+    </marker>
+    <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7AA116"/>
+    </marker>
+  </defs>
+
+  <text x="430" y="30" text-anchor="middle" class="title">Figure 13-1. "download → open" vs "read chunks in place"</text>
+
+  <!-- PANEL A: bad -->
+  <text x="50" y="68" class="panel" fill="#8B1C00">(A) 전통적 방식: 전체 파일 다운로드</text>
+  <rect x="40" y="82" width="780" height="150" fill="#FDF3E7" stroke="#D13212" stroke-width="1.5" rx="8"/>
+
+  <rect x="80" y="120" width="90" height="70" fill="#FFFFFF" stroke="#D13212" stroke-width="1.5" rx="4"/>
+  <text x="125" y="148" text-anchor="middle" class="item" font-weight="700">S3</text>
+  <text x="125" y="170" text-anchor="middle" class="note">h5ad 파일</text>
+
+  <line class="arrowR" x1="175" y1="155" x2="290" y2="155"/>
+  <text x="232" y="142" text-anchor="middle" class="bad">전체 다운로드 (수십 GB)</text>
+
+  <rect x="300" y="120" width="110" height="70" fill="#FFFFFF" stroke="#D13212" stroke-width="1.5" rx="4"/>
+  <text x="355" y="148" text-anchor="middle" class="item" font-weight="700">로컬 디스크</text>
+  <text x="355" y="170" text-anchor="middle" class="note">전체 복사본</text>
+
+  <line class="arrowR" x1="415" y1="155" x2="530" y2="155"/>
+  <text x="472" y="142" text-anchor="middle" class="bad">메모리 전체 로드</text>
+
+  <rect x="540" y="120" width="110" height="70" fill="#FFFFFF" stroke="#D13212" stroke-width="1.5" rx="4"/>
+  <text x="595" y="148" text-anchor="middle" class="item" font-weight="700">RAM</text>
+  <text x="595" y="170" text-anchor="middle" class="note">전체 로드</text>
+
+  <line class="arrowR" x1="655" y1="155" x2="730" y2="155"/>
+  <rect x="735" y="120" width="70" height="70" fill="#FFFFFF" stroke="#D13212" stroke-width="1.5" rx="4"/>
+  <text x="770" y="160" text-anchor="middle" class="item" font-weight="700">분석</text>
+
+  <text x="430" y="218" text-anchor="middle" class="bad">문제: 반복 분석마다 전체 재다운로드 · 중복 복사 · 메모리 부담</text>
+
+  <!-- PANEL B: good -->
+  <text x="50" y="272" class="panel" fill="#4F6B0C">(B) chunk 기반 원격 접근 (Zarr · TileDB-SOMA)</text>
+  <rect x="40" y="286" width="780" height="210" fill="#F3F8EC" stroke="#7AA116" stroke-width="1.5" rx="8"/>
+
+  <text x="125" y="320" text-anchor="middle" class="item" fill="#4F6B0C" font-weight="700">S3 (chunk로 분할)</text>
+  <g>
+    <rect x="72" y="330" width="50" height="30" fill="#FFFFFF" stroke="#7AA116"/>
+    <text x="97" y="350" text-anchor="middle" class="note">c0</text>
+    <rect x="128" y="330" width="50" height="30" fill="#FFFFFF" stroke="#7AA116"/>
+    <text x="153" y="350" text-anchor="middle" class="note">c1</text>
+    <rect x="72" y="366" width="50" height="30" fill="#FFFFFF" stroke="#7AA116"/>
+    <text x="97" y="386" text-anchor="middle" class="note">c2</text>
+    <rect x="128" y="366" width="50" height="30" fill="#FFFFFF" stroke="#7AA116"/>
+    <text x="153" y="386" text-anchor="middle" class="note">c3</text>
+    <rect x="72" y="402" width="50" height="30" fill="#FFFFFF" stroke="#7AA116"/>
+    <text x="97" y="422" text-anchor="middle" class="note">c4</text>
+    <rect x="128" y="402" width="50" height="30" fill="#FFFFFF" stroke="#7AA116"/>
+    <text x="153" y="422" text-anchor="middle" class="note">c5</text>
+  </g>
+
+  <line class="arrowG" x1="190" y1="345" x2="350" y2="345"/>
+  <line class="arrowG" x1="190" y1="381" x2="350" y2="381"/>
+  <line class="arrowG" x1="190" y1="417" x2="350" y2="417"/>
+  <text x="270" y="335" text-anchor="middle" class="good">필요한 chunk만 선택</text>
+
+  <rect x="360" y="320" width="200" height="120" fill="#E7F1FF" stroke="#146EB4" stroke-width="1.5" rx="4"/>
+  <text x="460" y="346" text-anchor="middle" class="item" fill="#0F4C81" font-weight="700">분석 프로세스</text>
+  <text x="460" y="370" text-anchor="middle" class="note">Dask · xarray · scanpy</text>
+  <text x="460" y="390" text-anchor="middle" class="note">병렬 워커들이</text>
+  <text x="460" y="410" text-anchor="middle" class="note">서로 다른 chunk 동시 처리</text>
+
+  <line class="arrowG" x1="565" y1="380" x2="660" y2="380"/>
+  <rect x="670" y="345" width="130" height="70" fill="#FFFFFF" stroke="#7AA116" stroke-width="1.5" rx="4"/>
+  <text x="735" y="375" text-anchor="middle" class="item" font-weight="700">결과</text>
+  <text x="735" y="395" text-anchor="middle" class="note">세포 집단별 요약</text>
+
+  <text x="430" y="470" text-anchor="middle" class="good">핵심: 필요한 조각만 읽는다 · 병렬 처리 · request 패턴이 성능·비용을 좌우</text>
+
+  <text x="430" y="528" text-anchor="middle" class="cap">chunk 크기 · sharding · metadata consolidation 설계가 성능을 결정한다</text>
+</svg>

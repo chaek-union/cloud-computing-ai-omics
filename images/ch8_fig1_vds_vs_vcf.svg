@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 520" font-family="'Amazon Ember','Noto Sans KR','Helvetica Neue',sans-serif">
+  <!--
+    AWS palette:
+      Squid Ink #232F3E | Orange #FF9900 | Anchor #146EB4 | Smile #E7F1FF
+      Storage Green #7AA116 | Warning Red #D13212 | Light BG #F2F3F3
+  -->
+  <style>
+    .title { font-size: 18px; font-weight: 700; fill: #232F3E; }
+    .sub   { font-size: 13px; fill: #232F3E; font-weight: 600; }
+    .cell  { font-size: 12px; fill: #232F3E; }
+    .var   { font-size: 12px; fill: #FF9900; font-weight: 700; }
+    .lbl   { font-size: 11px; fill: #545B64; }
+    .ref   { font-size: 12px; fill: #146EB4; font-weight: 600; }
+    .note  { font-size: 12px; fill: #545B64; font-style: italic; }
+    .size  { font-size: 16px; font-weight: 700; }
+    .cap   { font-size: 12px; fill: #545B64; text-anchor: middle; }
+  </style>
+
+  <text x="410" y="28" text-anchor="middle" class="title">Figure 8-1. VCF(dense) vs VDS(sparse, split) 표현</text>
+
+  <!-- LEFT PANEL: VCF dense -->
+  <text x="190" y="64" text-anchor="middle" class="sub">VCF (project-wide, dense)</text>
+  <rect x="40" y="80" width="300" height="180" rx="6" fill="#FDF3E7" stroke="#D13212" stroke-width="1.8"/>
+
+  <text x="52" y="104" class="lbl">pos</text>
+  <text x="110" y="104" class="lbl">s1</text>
+  <text x="150" y="104" class="lbl">s2</text>
+  <text x="190" y="104" class="lbl">s3</text>
+  <text x="230" y="104" class="lbl">...</text>
+  <text x="280" y="104" class="lbl">sN</text>
+  <line x1="50" y1="110" x2="330" y2="110" stroke="#D4D9DE"/>
+
+  <text x="52" y="130" class="cell">1</text>
+  <text x="110" y="130" class="cell">0/0</text><text x="150" y="130" class="cell">0/0</text><text x="190" y="130" class="cell">0/0</text><text x="230" y="130" class="cell">...</text><text x="280" y="130" class="cell">0/0</text>
+  <text x="52" y="152" class="cell">2</text>
+  <text x="110" y="152" class="cell">0/0</text><text x="150" y="152" class="var">0/1</text><text x="190" y="152" class="cell">0/0</text><text x="230" y="152" class="cell">...</text><text x="280" y="152" class="cell">0/0</text>
+  <text x="52" y="174" class="cell">3</text>
+  <text x="110" y="174" class="cell">0/0</text><text x="150" y="174" class="cell">0/0</text><text x="190" y="174" class="cell">0/0</text><text x="230" y="174" class="cell">...</text><text x="280" y="174" class="cell">0/0</text>
+  <text x="52" y="196" class="cell">4</text>
+  <text x="110" y="196" class="cell">0/0</text><text x="150" y="196" class="cell">0/0</text><text x="190" y="196" class="var">1/1</text><text x="230" y="196" class="cell">...</text><text x="280" y="196" class="cell">0/0</text>
+  <text x="52" y="218" class="cell">5</text>
+  <text x="110" y="218" class="cell">0/0</text><text x="150" y="218" class="cell">0/0</text><text x="190" y="218" class="cell">0/0</text><text x="230" y="218" class="cell">...</text><text x="280" y="218" class="cell">0/0</text>
+  <text x="52" y="240" class="cell">...</text>
+  <text x="190" y="240" class="cell">...</text>
+  <text x="190" y="278" text-anchor="middle" class="note">변이 없는 위치까지 모두 기록</text>
+
+  <!-- RIGHT PANEL: VDS split -->
+  <text x="620" y="64" text-anchor="middle" class="sub">VDS (sparse, split)</text>
+
+  <rect x="440" y="80" width="180" height="130" rx="6" fill="#E7F1FF" stroke="#146EB4" stroke-width="1.8"/>
+  <text x="530" y="100" text-anchor="middle" class="ref">variant_data (sparse)</text>
+  <line x1="450" y1="108" x2="610" y2="108" stroke="#146EB4" opacity="0.35"/>
+  <text x="460" y="130" class="cell">pos 2: s2 = <tspan fill="#FF9900" font-weight="700">0/1</tspan></text>
+  <text x="460" y="152" class="cell">pos 4: s3 = <tspan fill="#FF9900" font-weight="700">1/1</tspan></text>
+  <text x="460" y="174" class="cell">...</text>
+  <text x="530" y="200" text-anchor="middle" class="note">실제 변이만 저장</text>
+
+  <rect x="640" y="80" width="160" height="130" rx="6" fill="#F3F8EC" stroke="#7AA116" stroke-width="1.8"/>
+  <text x="720" y="100" text-anchor="middle" class="ref" fill="#4F6B0C">reference_data</text>
+  <line x1="650" y1="108" x2="790" y2="108" stroke="#7AA116" opacity="0.35"/>
+  <text x="660" y="130" class="cell">pos 1-10:</text>
+  <text x="670" y="148" class="cell">AN = 2N</text>
+  <text x="660" y="170" class="cell">pos 11-20:</text>
+  <text x="670" y="188" class="cell">AN = 2N</text>
+  <text x="720" y="208" text-anchor="middle" class="note">블록 단위 요약</text>
+
+  <!-- size comparison -->
+  <line x1="40" y1="310" x2="800" y2="310" stroke="#D4D9DE" stroke-dasharray="4 4"/>
+  <text x="410" y="338" text-anchor="middle" class="sub">gnomAD v4.0 (955,213 samples) 기준 저장 크기</text>
+
+  <rect x="80" y="360" width="400" height="28" fill="#FADBD1" stroke="#D13212" stroke-width="1.5"/>
+  <text x="280" y="379" text-anchor="middle" class="size" fill="#8B1C00">VCF: 약 897 TB</text>
+
+  <rect x="80" y="400" width="34" height="28" fill="#D9E7BD" stroke="#7AA116" stroke-width="1.5"/>
+  <text x="120" y="419" class="size" fill="#4F6B0C">VDS: 약 18 TB</text>
+
+  <text x="410" y="468" text-anchor="middle" class="cap">같은 정보를 담고도 약 50배 차이 — 압축 포맷이 아니라 코호트 규모 분석 표현의 차이</text>
+  <text x="410" y="488" text-anchor="middle" class="cap">출처: gnomAD Production Team 2023</text>
+</svg>

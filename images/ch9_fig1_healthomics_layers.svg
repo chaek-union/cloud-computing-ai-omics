@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 520" font-family="'Amazon Ember','Noto Sans KR','Helvetica Neue',sans-serif">
+  <!--
+    AWS service category palette:
+      Analytics purple #8C4FFF | Compute/Workflow orange #FF9900
+      Storage green #7AA116 | Squid Ink #232F3E (text/borders)
+  -->
+  <style>
+    .title { font-size: 18px; font-weight: 700; fill: #232F3E; }
+    .layer { font-size: 16px; font-weight: 700; }
+    .item  { font-size: 13px; fill: #232F3E; }
+    .note  { font-size: 12px; fill: #545B64; font-style: italic; }
+    .arrow { stroke: #232F3E; stroke-width: 2; fill: none; marker-end: url(#arr); }
+    .cap   { font-size: 12px; fill: #545B64; text-anchor: middle; }
+    .role  { font-size: 12px; font-weight: 700; fill: #545B64; text-anchor: start; }
+  </style>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#232F3E"/>
+    </marker>
+  </defs>
+
+  <text x="360" y="32" text-anchor="middle" class="title">Figure 9-1. AWS HealthOmics 3계층 구조</text>
+
+  <!-- Top: Analytics (AWS purple) -->
+  <rect x="140" y="70" width="440" height="100" fill="#EFE4FF" stroke="#8C4FFF" stroke-width="2" rx="8"/>
+  <text x="170" y="98" class="layer" fill="#5B2A9E">Analytics</text>
+  <text x="170" y="122" class="item">• annotation tables · variant store</text>
+  <text x="170" y="144" class="item">• Athena / Glue catalog 질의</text>
+  <text x="170" y="164" class="note">구조화된 해석과 SQL 질의가 만나는 층</text>
+
+  <line class="arrow" x1="360" y1="190" x2="360" y2="220"/>
+  <text x="370" y="210" class="note">structured output</text>
+
+  <!-- Middle: Workflows (AWS orange - compute tier) -->
+  <rect x="140" y="225" width="440" height="100" fill="#FFF3E0" stroke="#FF9900" stroke-width="2" rx="8"/>
+  <text x="170" y="253" class="layer" fill="#B36B00">Workflows</text>
+  <text x="170" y="277" class="item">• Nextflow · WDL · CWL 정의 실행</text>
+  <text x="170" y="299" class="item">• Ready2Run · private workflow · run/task</text>
+  <text x="170" y="319" class="note">재현 가능한 파이프라인 실행 계층</text>
+
+  <line class="arrow" x1="360" y1="345" x2="360" y2="375"/>
+  <text x="370" y="365" class="note">read set URI 입력</text>
+
+  <!-- Bottom: Storage (AWS green) -->
+  <rect x="140" y="380" width="440" height="100" fill="#F3F8EC" stroke="#7AA116" stroke-width="2" rx="8"/>
+  <text x="170" y="408" class="layer" fill="#4F6B0C">Storage</text>
+  <text x="170" y="432" class="item">• sequence store (FASTQ · uBAM · BAM · CRAM)</text>
+  <text x="170" y="454" class="item">• reference store · provenance 메타데이터</text>
+  <text x="170" y="474" class="note">데이터가 연구 자산으로 넘어오는 관문</text>
+
+  <!-- role labels on right -->
+  <text x="600" y="125" class="role">해석</text>
+  <text x="600" y="280" class="role">실행</text>
+  <text x="600" y="435" class="role">저장</text>
+
+  <text x="360" y="510" class="cap">세 층의 역할이 분리되어 있다는 점이 운영을 단순하게 만든다</text>
+</svg>

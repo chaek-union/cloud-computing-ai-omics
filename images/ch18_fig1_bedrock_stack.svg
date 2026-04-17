@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 560" font-family="'Amazon Ember','Noto Sans KR','Helvetica Neue',sans-serif">
+  <!--
+    AWS service category palette (top-down):
+      Gen-AI (Bedrock) magenta #CC2264
+      Analytics purple #8C4FFF
+      Compute/HealthOmics orange #FF9900
+      Storage green #7AA116
+      User highlight = AWS Orange #FF9900
+      Arrows & text: Squid Ink #232F3E
+  -->
+  <style>
+    .title { font-size: 18px; font-weight: 700; fill: #232F3E; }
+    .layer { font-size: 16px; font-weight: 700; }
+    .item  { font-size: 13px; fill: #232F3E; }
+    .note  { font-size: 12px; fill: #545B64; font-style: italic; }
+    .cap   { font-size: 12px; fill: #545B64; text-anchor: middle; }
+    .arrow { stroke: #232F3E; stroke-width: 2; fill: none; marker-end: url(#a1); }
+    .arrowU{ stroke: #FF9900; stroke-width: 2.5; fill: none; marker-end: url(#a2); }
+  </style>
+  <defs>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#232F3E"/>
+    </marker>
+    <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#FF9900"/>
+    </marker>
+  </defs>
+
+  <text x="380" y="30" text-anchor="middle" class="title">Figure 18-1. Bedrock 기반 유전체 질의의 계층 스택</text>
+
+  <!-- User icon (AWS orange) -->
+  <circle cx="80" cy="125" r="28" fill="#FFE9BF" stroke="#FF9900" stroke-width="2.5"/>
+  <text x="80" y="132" text-anchor="middle" class="item" fill="#8F5500" font-weight="700">User</text>
+  <line class="arrowU" x1="112" y1="125" x2="205" y2="125"/>
+  <text x="158" y="112" text-anchor="middle" class="note" fill="#B36B00">자연어 질문</text>
+
+  <!-- Layer 4: Natural language (Gen-AI magenta) -->
+  <rect x="215" y="80" width="500" height="90" fill="#FCE4EC" stroke="#CC2264" stroke-width="2" rx="8"/>
+  <text x="240" y="108" class="layer" fill="#8B1543">Natural language</text>
+  <text x="240" y="130" class="item">Bedrock · Claude · AgentCore</text>
+  <text x="240" y="152" class="note">자연어 ↔ SQL 번역, 보고서 요약, 설명 생성</text>
+
+  <line class="arrow" x1="465" y1="172" x2="465" y2="210"/>
+  <text x="475" y="195" class="note">SQL로 변환</text>
+
+  <!-- Layer 3: Query (Analytics purple) -->
+  <rect x="215" y="215" width="500" height="90" fill="#EFE4FF" stroke="#8C4FFF" stroke-width="2" rx="8"/>
+  <text x="240" y="243" class="layer" fill="#5B2A9E">Query layer</text>
+  <text x="240" y="265" class="item">Athena · Glue catalog · S3 Tables</text>
+  <text x="240" y="287" class="note">재현 가능한 SQL 질의 · provenance 추적</text>
+
+  <line class="arrow" x1="465" y1="307" x2="465" y2="345"/>
+  <text x="475" y="330" class="note">구조화된 테이블</text>
+
+  <!-- Layer 2: Annotation (HealthOmics/Compute orange) -->
+  <rect x="215" y="350" width="500" height="90" fill="#FFF3E0" stroke="#FF9900" stroke-width="2" rx="8"/>
+  <text x="240" y="378" class="layer" fill="#B36B00">Annotation</text>
+  <text x="240" y="400" class="item">HealthOmics · VEP · ClinVar · OMIM</text>
+  <text x="240" y="422" class="note">변이의 기능적·임상적 의미를 필드로 만든다</text>
+
+  <line class="arrow" x1="465" y1="442" x2="465" y2="480"/>
+  <text x="475" y="465" class="note">VEP annotated</text>
+
+  <!-- Layer 1: Raw data (Storage green) -->
+  <rect x="215" y="485" width="500" height="60" fill="#F3F8EC" stroke="#7AA116" stroke-width="2" rx="8"/>
+  <text x="240" y="513" class="layer" fill="#4F6B0C">Raw data</text>
+  <text x="240" y="533" class="item">VCF · sample metadata on S3</text>
+
+  <text x="380" y="555" class="cap">아래로 갈수록 원시 데이터 · 위로 갈수록 자연스러운 인터페이스</text>
+</svg>
