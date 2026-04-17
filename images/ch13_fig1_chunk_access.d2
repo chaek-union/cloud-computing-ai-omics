@@ -1,0 +1,147 @@
+title: |md
+  **Figure 13-1. "download → open" vs "read chunks in place"**
+| {
+  near: top-center
+  shape: text
+  style.font-size: 18
+}
+
+direction: down
+
+bad: {
+  label: "(A) 전통적 방식: 전체 파일 다운로드"
+  style.fill: "#FDF3E7"
+  style.stroke: "#D13212"
+  style.stroke-width: 2
+  style.border-radius: 8
+  style.font-size: 15
+  style.font-color: "#8B1C00"
+  style.bold: true
+
+  direction: right
+
+  s3: "S3\nh5ad 파일" {
+    style.fill: "#FFFFFF"
+    style.stroke: "#D13212"
+    style.border-radius: 4
+    style.font-size: 12
+  }
+  disk: "로컬 디스크\n전체 복사본" {
+    style.fill: "#FFFFFF"
+    style.stroke: "#D13212"
+    style.border-radius: 4
+    style.font-size: 12
+  }
+  ram: "RAM\n전체 로드" {
+    style.fill: "#FFFFFF"
+    style.stroke: "#D13212"
+    style.border-radius: 4
+    style.font-size: 12
+  }
+  analysis: "분석" {
+    style.fill: "#FFFFFF"
+    style.stroke: "#D13212"
+    style.border-radius: 4
+    style.font-size: 12
+  }
+
+  s3 -> disk: "전체 다운로드\n(수십 GB)" {
+    style.stroke: "#D13212"
+    style.stroke-width: 2
+    style.font-size: 11
+    style.font-color: "#8B1C00"
+    style.bold: true
+  }
+  disk -> ram: "메모리 전체 로드" {
+    style.stroke: "#D13212"
+    style.stroke-width: 2
+    style.font-size: 11
+    style.font-color: "#8B1C00"
+    style.bold: true
+  }
+  ram -> analysis {
+    style.stroke: "#D13212"
+    style.stroke-width: 2
+  }
+
+  problem: |md
+    **문제:** 반복 분석마다 전체 재다운로드 · 중복 복사 · 메모리 부담
+  | {
+    shape: text
+    style.font-size: 12
+    style.font-color: "#8B1C00"
+  }
+}
+
+good: {
+  label: "(B) chunk 기반 원격 접근 (Zarr · TileDB-SOMA)"
+  style.fill: "#F3F8EC"
+  style.stroke: "#7AA116"
+  style.stroke-width: 2
+  style.border-radius: 8
+  style.font-size: 15
+  style.font-color: "#4F6B0C"
+  style.bold: true
+
+  direction: right
+
+  s3: "S3 (chunk로 분할)" {
+    grid-columns: 2
+    style.fill: "#FFFFFF"
+    style.stroke: "#7AA116"
+    style.font-size: 12
+    style.font-color: "#4F6B0C"
+    c0: "c0" { style.fill: "#FFFFFF"; style.stroke: "#7AA116"; style.font-size: 11 }
+    c1: "c1" { style.fill: "#FFFFFF"; style.stroke: "#7AA116"; style.font-size: 11 }
+    c2: "c2" { style.fill: "#FFFFFF"; style.stroke: "#7AA116"; style.font-size: 11 }
+    c3: "c3" { style.fill: "#FFFFFF"; style.stroke: "#7AA116"; style.font-size: 11 }
+    c4: "c4" { style.fill: "#FFFFFF"; style.stroke: "#7AA116"; style.font-size: 11 }
+    c5: "c5" { style.fill: "#FFFFFF"; style.stroke: "#7AA116"; style.font-size: 11 }
+  }
+
+  workers: "분석 프로세스\n\nDask · xarray · scanpy\n병렬 워커들이\n서로 다른 chunk 동시 처리" {
+    style.fill: "#E7F1FF"
+    style.stroke: "#146EB4"
+    style.stroke-width: 2
+    style.border-radius: 4
+    style.font-size: 12
+    style.font-color: "#0F4C81"
+  }
+
+  result: "결과\n세포 집단별 요약" {
+    style.fill: "#FFFFFF"
+    style.stroke: "#7AA116"
+    style.stroke-width: 2
+    style.border-radius: 4
+    style.font-size: 12
+  }
+
+  s3 -> workers: "필요한 chunk만 선택" {
+    style.stroke: "#7AA116"
+    style.stroke-width: 2
+    style.font-size: 11
+    style.font-color: "#4F6B0C"
+    style.bold: true
+  }
+  workers -> result {
+    style.stroke: "#7AA116"
+    style.stroke-width: 2
+  }
+
+  insight: |md
+    **핵심:** 필요한 조각만 읽는다 · 병렬 처리 · request 패턴이 성능·비용을 좌우
+  | {
+    shape: text
+    style.font-size: 12
+    style.font-color: "#4F6B0C"
+  }
+}
+
+note: |md
+  _chunk 크기 · sharding · metadata consolidation 설계가 성능을 결정한다_
+| {
+  near: bottom-center
+  shape: text
+  style.font-size: 12
+  style.font-color: "#545B64"
+}

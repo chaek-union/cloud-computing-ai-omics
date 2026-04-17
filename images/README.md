@@ -23,11 +23,25 @@
 9. `ch18_fig1_bedrock_stack.svg` — Raw data → annotation → table → query → natural language 계층.
 10. `ch20_fig1_cost_leaks.svg` — 비용 누수 6축 다이어그램.
 
-## 그림 제작 도구 추천
+## 그림 제작 도구
 
-- 간단한 블록/경로도: [draw.io](https://draw.io), [Excalidraw](https://excalidraw.com), Keynote/PowerPoint → SVG 내보내기.
-- 과학 다이어그램: [BioRender](https://biorender.com) (라이선스 확인).
-- 코드 기반: [Mermaid](https://mermaid.js.org), [Graphviz](https://graphviz.org), [PlantUML](https://plantuml.com).
+이 책의 공식 다이어그램은 [D2](https://d2lang.com)로 작성한다. 각 그림은 `.d2` 소스와 그로부터 생성한 `.svg`를 나란히 보관한다.
+
+```bash
+d2 images/chX_figY_name.d2 images/chX_figY_name.svg
+```
+
+### AWS 서비스 카테고리 팔레트
+
+| 카테고리 | 배경 | 테두리 | 라벨 |
+|---------|-----|-------|------|
+| Storage | `#F3F8EC` | `#7AA116` | `#4F6B0C` |
+| Compute / Workflows | `#FFF3E0` | `#FF9900` | `#B36B00` |
+| Analytics | `#EFE4FF` | `#8C4FFF` | `#5B2A9E` |
+| Gen-AI (Bedrock) | `#FCE4EC` | `#CC2264` | `#8B1543` |
+| Network / Anchor | `#E7F1FF` | `#146EB4` | `#0F4C81` |
+| Warning / Bad path | `#FDF3E7` | `#D13212` | `#8B1C00` |
+| 본문 텍스트 | — | — | `#232F3E` (Squid Ink) |
 
 ## 라이선스
 

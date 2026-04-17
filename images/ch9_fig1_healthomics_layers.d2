@@ -1,0 +1,60 @@
+title: |md
+  **Figure 9-1. AWS HealthOmics 3계층 구조**
+| {
+  near: top-center
+  shape: text
+  style.font-size: 18
+}
+
+direction: down
+
+analytics: {
+  label: "Analytics\n\n• annotation tables · variant store\n• Athena / Glue catalog 질의\n구조화된 해석과 SQL 질의가 만나는 층"
+  style.fill: "#EFE4FF"
+  style.stroke: "#8C4FFF"
+  style.stroke-width: 2
+  style.border-radius: 8
+  style.font-size: 14
+  style.font-color: "#232F3E"
+}
+
+workflows: {
+  label: "Workflows\n\n• Nextflow · WDL · CWL 정의 실행\n• Ready2Run · private workflow · run/task\n재현 가능한 파이프라인 실행 계층"
+  style.fill: "#FFF3E0"
+  style.stroke: "#FF9900"
+  style.stroke-width: 2
+  style.border-radius: 8
+  style.font-size: 14
+  style.font-color: "#232F3E"
+}
+
+storage: {
+  label: "Storage\n\n• sequence store (FASTQ · uBAM · BAM · CRAM)\n• reference store · provenance 메타데이터\n데이터가 연구 자산으로 넘어오는 관문"
+  style.fill: "#F3F8EC"
+  style.stroke: "#7AA116"
+  style.stroke-width: 2
+  style.border-radius: 8
+  style.font-size: 14
+  style.font-color: "#232F3E"
+}
+
+analytics -> workflows: "structured output" {
+  style.stroke: "#232F3E"
+  style.font-size: 11
+  style.italic: true
+}
+
+workflows -> storage: "read set URI 입력" {
+  style.stroke: "#232F3E"
+  style.font-size: 11
+  style.italic: true
+}
+
+note: |md
+  _세 층의 역할이 분리되어 있다는 점이 운영을 단순하게 만든다_
+| {
+  near: bottom-center
+  shape: text
+  style.font-size: 12
+  style.font-color: "#545B64"
+}
