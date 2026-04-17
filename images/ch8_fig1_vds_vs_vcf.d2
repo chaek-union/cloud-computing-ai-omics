@@ -1,112 +1,83 @@
-title: |md
-  **Figure 8-1. VCF(dense) vs VDS(sparse, split) 표현**
-| {
-  near: top-center
-  shape: text
-  style.font-size: 18
-}
-
 direction: down
 
-representation: {
-  direction: right
-  style.fill: transparent
-  style.stroke: transparent
-
-  vcf: "VCF (project-wide, dense)" {
-    style.fill: "#FDF3E7"
-    style.stroke: "#D13212"
-    style.stroke-width: 2
-    style.border-radius: 6
-    style.font-size: 14
-    style.bold: true
-
-    table: |`md
-      pos  |  s1    s2    s3    ...   sN
-      ─────┼───────────────────────────────
-       1   |  0/0   0/0   0/0   ...   0/0
-       2   |  0/0  **0/1**  0/0   ...   0/0
-       3   |  0/0   0/0   0/0   ...   0/0
-       4   |  0/0   0/0  **1/1**  ...   0/0
-       5   |  0/0   0/0   0/0   ...   0/0
-      ...  |  ...   ...   ...   ...   ...
-    `| {
-      shape: text
-      style.font-size: 11
-    }
-
-    note: |md
-      _변이 없는 위치까지 모두 기록_
-    | {
-      shape: text
-      style.font-size: 11
-      style.font-color: "#8B1C00"
-    }
-  }
-
-  vds: "VDS (sparse, split)" {
-    style.fill: "#F2F3F3"
-    style.stroke: "#232F3E"
-    style.stroke-width: 1
-    style.border-radius: 6
-    style.font-size: 14
-    style.bold: true
-
-    variant_data: "variant_data (sparse)\n\npos 2: s2 = 0/1\npos 4: s3 = 1/1\n...\n\n실제 변이만 저장" {
-      style.fill: "#E7F1FF"
-      style.stroke: "#146EB4"
-      style.stroke-width: 2
-      style.border-radius: 6
-      style.font-size: 12
-      style.font-color: "#0F4C81"
-    }
-
-    reference_data: "reference_data\n\npos 1-10: AN = 2N\npos 11-20: AN = 2N\n\n블록 단위 요약" {
-      style.fill: "#F3F8EC"
-      style.stroke: "#7AA116"
-      style.stroke-width: 2
-      style.border-radius: 6
-      style.font-size: 12
-      style.font-color: "#4F6B0C"
-    }
+vars: {
+  d2-config: {
+    layout-engine: elk
   }
 }
 
-size: {
-  label: "gnomAD v4.0 (955,213 samples) 기준 저장 크기"
-  style.fill: transparent
+vcf: "VCF (project-wide, dense)\n\n모든 샘플 × 모든 위치를\n펼쳐 저장\n(변이 없는 칸도 0/0으로 기록)" {
+  style.fill: "#FDF3E7"
+  style.stroke: "#D13212"
+  style.stroke-width: 3
+  style.border-radius: 8
+  style.font-size: 22
+  style.font-color: "#8B1C00"
+  style.bold: true
+}
+
+vds: "VDS (sparse, split)" {
+  style.fill: "#F2F3F3"
+  style.stroke: "#232F3E"
+  style.stroke-width: 2
+  style.border-radius: 8
+  style.font-size: 22
+  style.bold: true
+
+  variant: "variant_data\n(sparse)\n\n실제 변이만 저장" {
+    style.fill: "#E7F1FF"
+    style.stroke: "#146EB4"
+    style.stroke-width: 3
+    style.border-radius: 8
+    style.font-size: 20
+    style.font-color: "#0F4C81"
+    style.bold: true
+  }
+
+  reference: "reference_data\n(block summary)\n\npos 1–10: AN = 2N\npos 11–20: AN = 2N" {
+    style.fill: "#F3F8EC"
+    style.stroke: "#7AA116"
+    style.stroke-width: 3
+    style.border-radius: 8
+    style.font-size: 20
+    style.font-color: "#4F6B0C"
+    style.bold: true
+  }
+}
+
+size: "gnomAD v4.0 (955,213 samples) 기준 저장 크기" {
+  style.fill: "#FFFFFF"
   style.stroke: "#D4D9DE"
   style.stroke-dash: 4
-  style.font-size: 14
+  style.font-size: 22
   style.bold: true
 
   vcf_bar: "VCF: 약 897 TB" {
-    width: 600
+    width: 900
+    height: 80
     style.fill: "#FADBD1"
     style.stroke: "#D13212"
-    style.stroke-width: 2
-    style.font-size: 16
+    style.stroke-width: 3
+    style.font-size: 28
     style.font-color: "#8B1C00"
     style.bold: true
   }
 
   vds_bar: "VDS: 약 18 TB" {
     width: 100
+    height: 80
     style.fill: "#D9E7BD"
     style.stroke: "#7AA116"
-    style.stroke-width: 2
-    style.font-size: 16
+    style.stroke-width: 3
+    style.font-size: 22
     style.font-color: "#4F6B0C"
     style.bold: true
   }
 }
 
-caption: |md
-  _같은 정보를 담고도 약 50배 차이 — 압축 포맷이 아니라 코호트 규모 분석 표현의 차이_
-  _출처: gnomAD Production Team 2023_
-| {
-  near: bottom-center
-  shape: text
-  style.font-size: 12
-  style.font-color: "#545B64"
+vcf -> vds: "같은 정보, 다른 표현" {
+  style.stroke: "#232F3E"
+  style.stroke-width: 2
+  style.font-size: 18
+  style.italic: true
 }
