@@ -42,7 +42,7 @@ VDS에서 또 하나 중요한 개념은 `local alleles`다. highly multiallelic
 
 실전에서는 Hail을 거창한 분산 이론보다 분석 단계별 흐름으로 배우는 편이 낫다. 첫 단계는 보통 `hl.import_vcf("s3://bucket/path/*.vcf.bgz")`처럼 S3에서 데이터를 읽어 MatrixTable을 만드는 것이다. 다음으로 샘플 정보와 phenotype, annotation table을 결합하고, variant QC와 sample QC를 수행한다. 그다음 기능적 annotation과 필터링을 통해 qualifying variant를 정의하고, 마지막에 burden test나 association testing으로 이어진다. 이 흐름은 로컬이든 EMR이든 동일하다.
 
-EMR이 필요한 이유는 이 분석 흐름의 각 단계가 더 큰 데이터와 더 많은 샘플을 만나면 갑자기 무거워지기 때문이다. import와 repartition, join과 aggregate, annotation lookup, cohort-level summary는 CPU뿐 아니라 메모리와 네트워크 셔플을 함께 요구한다. 따라서 Hail을 AWS에서 크게 돌릴 때는 "무조건 메모리형 인스턴스"보다 stage별 병목을 보는 감각이 중요하다. annotation join과 aggregation은 `r` 계열이, VCF import와 executor 확장이 중요한 단계는 `c` 계열이 더 잘 맞을 수 있다. Hail은 GPU 도구라기보다, CPU 노드 수와 적절한 분산 구조가 더 중요한 도구라는 점도 함께 강조하는 편이 좋다.
+EMR이 필요한 이유는 이 분석 흐름의 각 단계가 더 큰 데이터와 더 많은 샘플을 만나면 갑자기 무거워지기 때문이다. import와 repartition, join과 aggregate, annotation lookup, cohort-level summary는 CPU뿐 아니라 메모리와 네트워크 셔플을 함께 요구한다. 따라서 Hail을 AWS에서 크게 돌릴 때는 "항상 메모리형 인스턴스"보다 stage별 병목을 보는 감각이 중요하다. annotation join과 aggregation은 `r` 계열이, VCF import와 executor 확장이 중요한 단계는 `c` 계열이 더 잘 맞을 수 있다. Hail은 GPU 도구라기보다, CPU 노드 수와 적절한 분산 구조가 더 중요한 도구라는 점도 함께 강조하는 편이 좋다.
 
 ## EMR on EC2, EMR on EKS, EMR Serverless 비교
 

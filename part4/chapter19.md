@@ -46,13 +46,13 @@ Seven Bridges는 더 오래된 세대의 대표적 data broker다. AWS 위에서
 
 AWS Marketplace는 third-party software, data, services를 찾고 사고 배포하고 관리하는 curated catalog다. 유전체 책에서는 이를 단순한 앱 스토어보다 `조달 계층`으로 설명하는 편이 더 정확하다. 즉 사용자는 AWS bill과 계약 구조 안에서 외부 솔루션을 도입할 수 있고, 때로는 private offer를 통해 맞춤 가격과 조건을 협상할 수 있다. 학생이 이 구조를 이해하면, 모든 연구 조직이 직접 플랫폼을 만들 필요는 없다는 현실을 자연스럽게 받아들일 수 있다. 연구 인프라는 기술만이 아니라 조달과 계약의 문제이기도 하다.
 
-Helical의 `Bio Foundation Model Platform for In-Silico Labs` listing은 이 조달형 모델을 설명하기 좋은 사례다. listing 기준 이 제품은 SaaS이며, private offer, deployed on AWS, 추가 인프라 비용 가능성 같은 구조를 가진다. 또한 `Model Library`, `Model Personalization`, `In-Silico Experiments` 세 모듈을 통해 single-cell, mRNA, DNA foundation model을 조합해 target identification, biomarker discovery, patient stratification, RNA design을 지원한다고 설명한다. 이 사례를 책에서는 "자동화 실험실"을 물리 실험실의 대체가 아니라 `foundation model + proprietary data adaptation + large-scale virtual experiment orchestration` 계층으로 설명하는 편이 정확하다. 다만 AWS Marketplace listing은 제품 개요와 계약 구조를 보여 주는 자료이지, 성능에 대한 독립 검증 자료가 아니라는 caveat도 반드시 함께 적어야 한다.
+Helical의 `Bio Foundation Model Platform for In-Silico Labs` listing은 이 조달형 모델을 설명하기 좋은 사례다. listing 기준 이 제품은 SaaS이며, private offer, deployed on AWS, 추가 인프라 비용 가능성 같은 구조를 가진다. 또한 `Model Library`, `Model Personalization`, `In-Silico Experiments` 세 모듈을 통해 single-cell, mRNA, DNA foundation model을 조합해 target identification, biomarker discovery, patient stratification, RNA design을 지원한다고 설명한다. 이 사례를 책에서는 "자동화 실험실"을 물리 실험실의 대체가 아니라 `foundation model + proprietary data adaptation + large-scale virtual experiment orchestration` 계층으로 설명하는 편이 정확하다. 다만 AWS Marketplace listing은 제품 개요와 계약 구조를 보여 주는 자료이지, 성능에 대한 독립 검증 자료가 아니라는 caveat도 함께 적어야 한다.
 
 ## 공개 데이터 민주화와 hybrid cloud의 공존
 
 산업계 사례를 읽다 보면 한쪽에서는 데이터를 AWS 안에서 바로 읽는 공개 데이터 민주화가 진행되고, 다른 한쪽에서는 여전히 hybrid cloud가 중요한 현실이라는 사실이 동시에 드러난다. Amazon Science의 SRA 기사는 NIH Sequence Read Archive가 AWS Open Data Sponsorship Program을 통해 네이티브하게 접근 가능해졌다고 설명한다. 이 흐름은 `데이터가 있는 곳으로 계산을 가져가는` 방식이 공개 데이터 생태계에서 얼마나 중요해졌는지를 보여 준다. 그러나 모든 조직이 이 모델 하나로 수렴하는 것은 아니다. 법적, 윤리적, 네트워크적 이유로 일부 데이터는 여전히 기관 내부나 다른 science cloud에 남을 수 있다.
 
-Kyoto University의 hybrid cloud 논문은 이런 현실을 잘 보여 준다. 대형 기관에서는 on-prem, 학술용 클라우드, 공용 클라우드 AWS를 함께 묶는 구성이 오히려 더 현실적일 수 있다. 학생은 여기서 "클라우드가 전통 인프라를 완전히 대체한다"는 단선적 서사를 버려야 한다. 실제 연구 인프라는 대개 혼합형이다. 중요한 것은 어느 한 플랫폼을 신앙처럼 택하는 것이 아니라, 데이터 위치를 유지하면서 계산과 워크플로 계층을 적절히 조합하는 능력이다.
+Kyoto University의 hybrid cloud 논문은 이런 현실을 잘 보여 준다. 대형 기관에서는 on-prem, 학술용 클라우드, 공용 클라우드 AWS를 함께 묶는 구성이 오히려 더 현실적일 수 있다. 학생은 여기서 "클라우드가 전통 인프라를 그대로 대체한다"는 단선적 서사를 버려야 한다. 실제 연구 인프라는 대개 혼합형이다. 중요한 것은 어느 한 플랫폼을 신앙처럼 택하는 것이 아니라, 데이터 위치를 유지하면서 계산과 워크플로 계층을 적절히 조합하는 능력이다.
 
 ## 연구실이 바로 가져올 수 있는 운영 원칙
 

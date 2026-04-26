@@ -83,7 +83,7 @@ Table 2. 유전체 데이터 유형별 저장 위치의 첫 선택
 
 S3를 이해할 때 또 하나 중요한 것은 모든 객체가 같은 비용 구조를 갖지 않는다는 점이다. 가장 단순한 `S3 Standard`는 자주 읽고 쓰는 데이터에 적합한 기본 계층이다. 접근 패턴이 불규칙하거나 예측하기 어려운 경우에는 `S3 Intelligent-Tiering`이 유용할 수 있다. 반면 `Standard-IA`나 Glacier 계열은 저장 단가를 낮추는 대신, 읽어올 때의 retrieval fee나 최소 저장 기간(minimum storage duration), 복원 지연을 고려해야 한다. 따라서 초보자는 "가장 싼 클래스가 항상 가장 경제적이다"라는 생각부터 버리는 편이 좋다.
 
-유전체 데이터는 생애주기(lifecycle)가 뚜렷하므로 storage class 사고방식이 특히 중요하다. 분석 직후의 FASTQ와 결과물은 재분석과 검증이 자주 일어나므로 `hot` 데이터에 가깝고, 이 단계에서는 `S3 Standard`가 자연스럽다. 몇 주나 몇 달이 지나 접근 빈도가 줄어들면 `Intelligent-Tiering`이나 `Standard-IA`가 적절할 수 있다. 장기 보관 의무가 있는 원시 데이터나 거의 꺼내지 않는 보관본은 `Glacier Instant Retrieval`, `Glacier Flexible Retrieval`, `Glacier Deep Archive` 같은 colder tier를 검토할 수 있다. 하지만 재분석이 잦은 데이터를 너무 빨리 Deep Archive로 밀어 넣으면 저장비는 줄어도 복원 지연과 retrieval 비용 때문에 프로젝트 전체 비용은 오히려 올라갈 수 있다 (AWS 2024b).
+유전체 데이터는 생애주기(lifecycle)가 비교적 잘 구분되므로 storage class 사고방식이 특히 중요하다. 분석 직후의 FASTQ와 결과물은 재분석과 검증이 자주 일어나므로 `hot` 데이터에 가깝고, 이 단계에서는 `S3 Standard`가 자연스럽다. 몇 주나 몇 달이 지나 접근 빈도가 줄어들면 `Intelligent-Tiering`이나 `Standard-IA`가 적절할 수 있다. 장기 보관 의무가 있는 원시 데이터나 거의 꺼내지 않는 보관본은 `Glacier Instant Retrieval`, `Glacier Flexible Retrieval`, `Glacier Deep Archive` 같은 colder tier를 검토할 수 있다. 하지만 재분석이 잦은 데이터를 너무 빨리 Deep Archive로 밀어 넣으면 저장비는 줄어도 복원 지연과 retrieval 비용 때문에 프로젝트 전체 비용은 오히려 올라갈 수 있다 (AWS 2024b).
 
 실전에서는 lifecycle rule을 통해 데이터를 단계적으로 이동시키는 패턴을 많이 쓴다. 예를 들어 업로드 직후에는 `S3 Standard`에 두고, 일정 기간이 지나면 `Intelligent-Tiering`이나 `Standard-IA`로 옮기고, 장기 보관 대상만 Glacier 계열로 내리는 식이다. 이 구조는 학생들에게 단순 암기보다 훨씬 유익하다. 중요한 것은 storage class 이름 자체가 아니라, 어떤 데이터가 아직 활발히 사용 중인지, 어떤 데이터가 보관 단계로 들어갔는지를 지속적으로 구분하는 습관이다. 비용 감각은 청구서를 본 뒤에 배우는 것이 아니라, 저장소를 설계할 때부터 함께 배워야 한다.
 

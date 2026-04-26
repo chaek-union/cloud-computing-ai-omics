@@ -18,6 +18,17 @@
 
 가장 단순한 실전 예제는 다음과 같이 그릴 수 있다. vendor 또는 시퀀싱 센터가 데이터를 S3나 HealthOmics sequence store로 전달한다. 연구실은 이를 sample metadata와 연결하고, Nextflow 또는 HealthOmics workflow를 돌려 정렬과 variant calling을 수행한다. 결과 VCF와 annotation table은 Athena나 Spark에서 질의 가능한 구조로 정리되고, 마지막에는 Bedrock이나 dashboard 계층을 통해 사람이 해석하고 공유한다. 이 흐름은 단순한 자동화가 아니라, 원시 파일이 점점 더 구조화된 연구 자산으로 변해 가는 과정이다.
 
+Table 1. 통합 예제에서 단계별로 남겨야 할 산출물
+
+| 단계 | 연구실 질문 | 남겨야 할 산출물 |
+|---|---|---|
+| Vendor handoff | 어떤 샘플이 어떤 조건으로 도착했는가 | 납품 목록, checksum, sample metadata |
+| 등록 | 이 샘플을 어떤 프로젝트와 subject에 연결할 것인가 | read set ID, subject ID, sample ID, reference |
+| Workflow 실행 | 어떤 파이프라인과 파라미터로 돌렸는가 | manifest, parameter file, workflow version, log |
+| 결과 정리 | 어떤 결과를 반복 질의할 것인가 | VCF/CRAM, QC summary, annotation table |
+| Cohort query | 어떤 질문을 표준 질의로 만들 것인가 | Athena query, 결과 TSV, query version |
+| 해석과 공유 | 누가 어떤 근거로 결론을 승인했는가 | 보고서 초안, 근거 테이블, 승인 기록 |
+
 ## Vendor handoff - read set 등록과 메타데이터 정리
 
 통합 워크플로의 첫 단계는 파일 자체보다 메타데이터다. 시퀀싱 센터에서 파일이 도착했다고 해서 분석 준비가 끝난 것은 아니다. 샘플 ID, 라이브러리 정보, 시퀀싱 플랫폼, 참조 유전체 버전, 승인 상태, 프로젝트 코드, 환자 또는 코호트와의 연결 규칙이 함께 정리되어야 한다. HealthOmics sequence store와 read set 개념이 유용한 이유는 바로 이 단계에서 데이터의 등록과 provenance를 더 명시적으로 관리할 수 있기 때문이다. 단순히 폴더에 파일을 복사해 두는 방식은 빠를 수 있지만, 이후 누가 어떤 샘플을 어떤 파이프라인으로 분석했는지 추적하기가 훨씬 어려워진다.
@@ -28,9 +39,9 @@
 
 omics 연구에서 data warehouse, data lake, lakehouse는 경쟁 개념이 아니라 서로 다른 데이터 상태를 가리키는 편이 더 맞다. 원시 FASTQ, BAM, CRAM, raw image는 보통 data lake 계층에 가깝다. 이 단계의 핵심은 원본 보존과 유연한 저장이며, 스키마를 엄격히 강제하기보다 나중 분석을 위해 자산을 남겨 두는 데 의미가 있다. 반면 annotation이 붙은 variant table, cohort filtering table, count matrix summary, quality summary 같은 반복 질의용 데이터는 lakehouse 계층에 더 가깝다. 여기서는 Parquet, S3 Tables, Glue catalog, Athena 같은 구조가 중요해진다. 마지막으로 임상 리포트용 요약 표, 운영 대시보드, PI용 cohort summary는 warehouse에 가까운 계층으로 볼 수 있다.
 
-이 구분은 이론적 분류가 아니라 실제 설계 도구다. 원시 FASTQ를 바로 Athena로 질의하려 하거나, 임상 리포트를 만들 데이터를 raw data zone에 그대로 두면 운영이 금방 복잡해진다. 반대로 반복 질의가 필요한 annotation 결과를 계속 VCF와 TSV 상태로만 남겨 두면, cohort 분석과 dashboard 작성이 매우 비효율적이 된다. 따라서 통합 예제에서는 `원시 데이터는 lake에, 반복 질의 데이터는 lakehouse에, 요약과 보고는 warehouse에`라는 큰 원칙을 분명히 해 두는 것이 좋다. 학생은 이를 통해 서비스 선택보다 먼저 데이터 계층을 나누는 사고를 배우게 된다.
+이 구분은 이론적 분류가 아니라 실제 설계 도구다. 원시 FASTQ를 바로 Athena로 질의하려 하거나, 임상 리포트를 만들 데이터를 raw data zone에 그대로 두면 운영이 금방 복잡해진다. 반대로 반복 질의가 필요한 annotation 결과를 계속 VCF와 TSV 상태로만 남겨 두면, cohort 분석과 dashboard 작성이 매우 비효율적이 된다. 따라서 통합 예제에서는 `원시 데이터는 lake에, 반복 질의 데이터는 lakehouse에, 요약과 보고는 warehouse에`라는 큰 원칙을 짚어 두는 것이 좋다. 학생은 이를 통해 서비스 선택보다 먼저 데이터 계층을 나누는 사고를 배우게 된다.
 
-Table 1. 통합 오믹스 워크플로에서의 데이터 계층
+Table 2. 통합 오믹스 워크플로에서의 데이터 계층
 
 | 계층 | 대표 데이터 | AWS 예시 |
 |---|---|---|
@@ -46,15 +57,15 @@ Table 1. 통합 오믹스 워크플로에서의 데이터 계층
 
 ## 테이블화와 cohort query - Athena가 들어오는 지점
 
-변이 해석으로 가기 전에 반드시 필요한 단계가 구조화된 테이블화다. VCF 자체는 여전히 매우 중요하지만, cohort 질의나 운영 요약, phenotype과의 결합, frequency 비교 같은 작업에는 컬럼형 테이블과 SQL 계층이 훨씬 편리한 경우가 많다. Athena는 바로 이 지점에서 강점을 가진다. annotation이 끝난 variant table이나 sample-level QC table, phenotype metadata를 Glue catalog와 연결해 두면, 연구자는 복잡한 파서 없이도 반복 질의를 수행할 수 있다. 이 과정이 바로 lakehouse 사고의 실전적 구현이다.
+변이 해석으로 가기 전에 대체로 필요한 단계가 구조화된 테이블화다. VCF 자체는 여전히 매우 중요하지만, cohort 질의나 운영 요약, phenotype과의 결합, frequency 비교 같은 작업에는 컬럼형 테이블과 SQL 계층이 훨씬 편리한 경우가 많다. Athena는 바로 이 지점에서 강점을 가진다. annotation이 끝난 variant table이나 sample-level QC table, phenotype metadata를 Glue catalog와 연결해 두면, 연구자는 복잡한 파서 없이도 반복 질의를 수행할 수 있다. 이 과정이 바로 lakehouse 사고의 실전적 구현이다.
 
 학생에게는 이 단계가 왜 중요한지 구체적 질문으로 보여 주는 것이 좋다. 예를 들어 `BRCA1과 BRCA2의 pathogenic variant를 가진 샘플은 몇 명인가`, `이 phenotype group에서 rare damaging variant burden은 어떤가`, `특정 ancestry group에서 allele frequency가 다른가` 같은 질문은 Athena와 구조화된 테이블이 있을 때 훨씬 자연스럽다. 반대로 모든 것을 VCF 원본 위에서만 해결하려 하면, 분석은 가능하더라도 반복성과 협업성이 크게 떨어진다. 즉 변이 해석의 시작은 모델이 아니라, 질의 가능한 테이블을 만드는 일이다.
 
 ## 자연어 해석과 보고 - Bedrock과 Quick의 위치
 
-마지막 단계에서 비로소 생성형 AI와 시각화 계층이 등장한다. Bedrock은 구조화된 데이터가 이미 준비된 뒤에, 자연어 질문을 더 쉽게 던지고 결과를 요약하고 보고 초안을 만드는 해석 계층으로 이해하는 편이 정확하다. 이것은 `AI가 원시 VCF를 이해한다`는 뜻이 아니다. 오히려 앞 단계에서 annotation, 테이블화, provenance 정리가 충분히 이루어졌기 때문에, 마지막에 자연어 인터페이스가 유용해지는 것이다. 따라서 학생에게는 `AI가 먼저가 아니라 데이터 정돈이 먼저`라는 메시지를 분명히 남겨야 한다.
+마지막 단계에서 비로소 생성형 AI와 시각화 계층이 등장한다. Bedrock은 구조화된 데이터가 이미 준비된 뒤에, 자연어 질문을 더 쉽게 던지고 결과를 요약하고 보고 초안을 만드는 해석 계층으로 이해하는 편이 정확하다. 이것은 `AI가 원시 VCF를 이해한다`는 뜻이 아니다. 오히려 앞 단계에서 annotation, 테이블화, provenance 정리가 충분히 이루어졌기 때문에, 마지막에 자연어 인터페이스가 유용해지는 것이다. 따라서 학생에게는 `AI가 먼저가 아니라 데이터 정돈이 먼저`라는 메시지를 남겨야 한다.
 
-Amazon Quick 같은 시각화 계층도 비슷하다. Quick은 직접 유전체 계산을 수행하는 서비스가 아니라, cohort dashboard, 운영 지표, 결과 공유를 위한 상위 요약 계층에 더 가깝다. 즉 Bedrock이 질의와 설명을 돕는 자연어 계층이라면, Quick은 요약과 관찰을 돕는 시각화 계층이다. 통합 워크플로의 끝은 반드시 거대한 알고리즘이 아니라, 사람이 이해하고 공유할 수 있는 형태로 결과를 정리하는 것이다. 이 점까지 포함해야 시퀀싱 데이터에서 해석까지의 흐름이 완성된다.
+Amazon Quick 같은 시각화 계층도 비슷하다. Quick은 직접 유전체 계산을 수행하는 서비스가 아니라, cohort dashboard, 운영 지표, 결과 공유를 위한 상위 요약 계층에 더 가깝다. 즉 Bedrock이 질의와 설명을 돕는 자연어 계층이라면, Quick은 요약과 관찰을 돕는 시각화 계층이다. 통합 워크플로의 끝은 늘 거대한 알고리즘이 아니라, 사람이 이해하고 공유할 수 있는 형태로 결과를 정리하는 것이다. 이 점까지 포함해야 시퀀싱 데이터에서 해석까지의 흐름이 완성된다.
 
 ## 핵심 개념 정리
 

@@ -75,7 +75,7 @@ Table 2. 오믹스 ML에서 자주 쓰는 연결 패턴
 
 그 위에 더 큰 확장으로 foundation model 계열이 있다. AWS Machine Learning 블로그의 2024년 글은 AWS HealthOmics sequence store를 오믹스 데이터 저장 계층으로 사용하고, SageMaker Training을 이용해 HyenaDNA 계열 genomic language model을 pre-train하는 예제를 제시한다. 여기서 중요한 메시지는 "오믹스 ML의 최신 확장도 결국 S3 또는 HealthOmics에 정리된 데이터 위에서 관리형 학습 작업을 돌리는 구조"라는 점이다. 즉 foundation model이 등장해도 데이터 계층과 학습 계층의 분리는 여전히 유지된다 (Ariyawansa and Handley 2024).
 
-다만 모든 팀이 foundation model stack을 직접 구축할 필요는 없다. 대부분의 연구실과 바이오텍 팀은 먼저 작은 supervised task, embedding 생성, notebook 기반 탐색에서 더 큰 가치를 얻는다. 학생에게는 이 순서를 분명히 가르치는 편이 중요하다. 먼저 `작은 문제를 안정적으로 푸는 SageMaker 사용법`을 익히고, 그다음에야 분산 학습과 대형 모델로 확장하는 것이 바람직하다. 특히 single-cell과 spatial omics의 데이터 접근 계층은 따로 복잡하므로, 그 부분은 [13장](chapter13.md)에서 다루는 chunked storage와 remote access 개념과 함께 보는 편이 정확하다.
+다만 모든 팀이 foundation model stack을 직접 구축할 필요는 없다. 대부분의 연구실과 바이오텍 팀은 먼저 작은 supervised task, embedding 생성, notebook 기반 탐색에서 더 큰 가치를 얻는다. 학생에게는 이 순서를 짚어 주는 편이 중요하다. 먼저 `작은 문제를 안정적으로 푸는 SageMaker 사용법`을 익히고, 그다음에야 분산 학습과 대형 모델로 확장하는 것이 바람직하다. 특히 single-cell과 spatial omics의 데이터 접근 계층은 따로 복잡하므로, 그 부분은 [13장](chapter13.md)에서 다루는 chunked storage와 remote access 개념과 함께 보는 편이 정확하다.
 
 ## 비용과 운영 원칙을 어떻게 잡아야 하는가
 
@@ -83,7 +83,7 @@ SageMaker의 가장 흔한 오해는 "관리형 서비스니까 알아서 싸고
 
 오믹스 분석에서는 데이터 위치도 중요하다. Training Job과 입력 S3 버킷, HealthOmics sequence store, Athena query result가 같은 리전 안에 있어야 운영이 단순하고 전송 비용 위험도 줄어든다. 또한 notebook에서 우연히 잘 돌아간 코드를 곧바로 논문용 생산 파이프라인으로 착각해서는 안 된다. 재현성 있는 학습을 원하면 코드 버전, 데이터 snapshot, 파라미터, 컨테이너 이미지를 분리해 관리형 job으로 승격시켜야 한다. 이 원칙은 작은 random forest에서 대형 genomic language model에 이르기까지 모두 같다.
 
-SageMaker는 오믹스 분석의 전 과정을 혼자 담당하는 서비스가 아니다. 대신 S3와 HealthOmics에 정리된 데이터, Batch와 Nextflow가 만든 결과, Athena가 좁혀 준 cohort를 바탕으로, 탐색에서 학습과 배포까지 이어지는 관리형 ML 계층을 제공한다. 따라서 오믹스에서 SageMaker를 잘 쓴다는 것은 "클라우드에 Jupyter를 띄운다"가 아니라, 데이터 파이프라인과 모델 파이프라인의 경계를 명확히 세우고 그 사이를 안정적으로 연결하는 일에 가깝다.
+SageMaker는 오믹스 분석의 전 과정을 혼자 담당하는 서비스가 아니다. 대신 S3와 HealthOmics에 정리된 데이터, Batch와 Nextflow가 만든 결과, Athena가 좁혀 준 cohort를 바탕으로, 탐색에서 학습과 배포까지 이어지는 관리형 ML 계층을 제공한다. 따라서 오믹스에서 SageMaker를 잘 쓴다는 것은 "클라우드에 Jupyter를 띄운다"가 아니라, 데이터 파이프라인과 모델 파이프라인의 경계를 분리하고 그 사이를 안정적으로 연결하는 일에 가깝다.
 
 ## 핵심 개념 정리
 

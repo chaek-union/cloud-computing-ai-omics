@@ -38,15 +38,15 @@ Table 1. 짧은 독립 작업의 대표 예시와 공통 성질
 
 이 구조의 장점은 직관성이다. 인스턴스를 띄우고, playbook으로 필요한 패키지를 설치하고, 각 서버에 반복 범위를 나눠 주고, 결과를 모으면 된다. 팀이 이미 SSH와 Linux 운영에 익숙하고, 한 번에 끝내야 하는 대량 실행을 빨리 해치워야 한다면 여전히 나쁜 선택은 아니다. 특히 계산 단위가 매우 단순하고, 중앙 큐나 컨테이너 계층을 새로 배우는 비용이 더 클 때는 직접 제어가 오히려 편할 수 있다.
 
-하지만 규모가 수천 개 수준으로 커지면, 이 구조는 곧바로 `서버를 띄울 수 있는가`의 문제가 아니라 `실패를 어떻게 다룰 것인가`의 문제로 바뀐다. 어떤 인스턴스가 중간에 회수되었는지, 어떤 범위가 아직 끝나지 않았는지, 어디서부터 재실행해야 하는지, quota 때문에 실제로 몇 대가 떠 있는지, 서로 다른 인스턴스 타입이 섞여도 결과 수집 규칙이 유지되는지 같은 질문이 더 중요해진다. 즉 `Ansible + Spot` 구조는 가능하지만, 오케스트레이션 부담을 사람이 더 많이 떠안는 구조라는 점을 분명히 이해해야 한다.
+하지만 규모가 수천 개 수준으로 커지면, 이 구조는 곧바로 `서버를 띄울 수 있는가`의 문제가 아니라 `실패를 어떻게 다룰 것인가`의 문제로 바뀐다. 어떤 인스턴스가 중간에 회수되었는지, 어떤 범위가 아직 끝나지 않았는지, 어디서부터 재실행해야 하는지, quota 때문에 실제로 몇 대가 떠 있는지, 서로 다른 인스턴스 타입이 섞여도 결과 수집 규칙이 유지되는지 같은 질문이 더 중요해진다. 즉 `Ansible + Spot` 구조는 가능하지만, 오케스트레이션 부담을 사람이 더 많이 떠안는 구조라는 점을 이해해야 한다.
 
 ## 기술적으로 가능한가 - Spot vCPU quota와 Fleet quota
 
-수천 개 Spot 인스턴스 launch가 가능한지 묻는다면, 공식 문서는 분명히 "가능하다"고 답한다. EC2 Fleet과 Spot Fleet 문서는 tens, hundreds, or thousands of EC2 instances를 한 번의 요청으로 시작할 수 있다고 설명하며, fleet당 target capacity 기본 quota는 10,000, 리전 전체 target capacity quota는 100,000으로 제시한다 (AWS 2026a). 즉 "수천 개 인스턴스" 자체는 비정상적인 요구가 아니다. 문제는 이것이 곧바로 아무 계정에서나 기본 설정으로 가능한 것은 아니라는 점이다.
+수천 개 Spot 인스턴스 launch가 가능한지 묻는다면, 공식 문서는 "가능하다"고 답한다. EC2 Fleet과 Spot Fleet 문서는 tens, hundreds, or thousands of EC2 instances를 한 번의 요청으로 시작할 수 있다고 설명하며, fleet당 target capacity 기본 quota는 10,000, 리전 전체 target capacity quota는 100,000으로 제시한다 (AWS 2026a). 즉 "수천 개 인스턴스" 자체는 비정상적인 요구가 아니다. 문제는 이것이 곧바로 아무 계정에서나 기본 설정으로 가능한 것은 아니라는 점이다.
 
 실제 병목은 대개 Spot vCPU quota와 capacity availability다. Spot quota는 인스턴스 개수로 관리되지 않고 vCPU 단위로 관리되며, 계정과 리전별로 적용된다 (AWS 2026b). 예를 들어 기본 계정에서 Standard Spot 요청 quota가 매우 낮게 시작할 수 있으므로, 1,000개의 `c` 계열 인스턴스를 바로 띄우려 하면 quota에 먼저 막힐 수 있다 (AWS 2026c). 따라서 "기술적으로 가능하다"와 "내 계정에서 지금 바로 가능하다"는 서로 다른 문장이다. 대규모 병렬 실행을 준비할 때는 launch template보다 먼저 현재 Spot quota와 필요한 target capacity를 계산해야 한다.
 
-또 하나 놓치기 쉬운 점은 capacity가 항상 즉시 확보되지 않는다는 사실이다. Spot best practices 문서는 필요한 aggregate capacity가 언제나 즉시 주어지거나 계속 유지된다고 보장하지 않는다고 분명히 말한다 (AWS 2026d). 따라서 짧은 독립 작업이 Spot과 잘 맞는다고 해서, 원하는 시점에 원하는 수만큼 인스턴스를 한 번에 확보할 수 있다고 가정하면 안 된다. 다중 인스턴스 타입, 다중 가용 영역, 유연한 shard 설계가 중요한 이유가 여기에 있다.
+또 하나 놓치기 쉬운 점은 capacity가 항상 즉시 확보되지 않는다는 사실이다. Spot best practices 문서는 필요한 aggregate capacity가 언제나 즉시 주어지거나 계속 유지된다고 보장하지 않는다고 명시한다 (AWS 2026d). 따라서 짧은 독립 작업이 Spot과 잘 맞는다고 해서, 원하는 시점에 원하는 수만큼 인스턴스를 한 번에 확보할 수 있다고 가정하면 안 된다. 다중 인스턴스 타입, 다중 가용 영역, 유연한 shard 설계가 중요한 이유가 여기에 있다.
 
 Table 2. 대규모 Spot 병렬에서 먼저 확인할 항목
 
@@ -59,7 +59,7 @@ Table 2. 대규모 Spot 병렬에서 먼저 확인할 항목
 
 ## 왜 요즘은 Batch나 Fleet가 더 자연스러운가
 
-오늘날 `Ansible + 개별 Spot request`보다 `AWS Batch 또는 EC2 Fleet`가 더 자연스러운 첫 선택지인 이유는, 운영의 무게중심이 이미 인스턴스 생성보다 상위 계층으로 옮겨 갔기 때문이다. AWS 자체도 `RequestSpotInstances` API를 legacy API로 보고 강하게 권장하지 않는다 (AWS 2026e). 대신 Spot best practices는 EC2 Fleet, Auto Scaling, 통합 서비스, price-capacity-optimized 전략 같은 더 현대적인 요청 계층을 권한다 (AWS 2026d). 메시지는 분명하다. Spot을 쓰지 말라는 뜻이 아니라, Spot을 직접 원시 API 수준에서 다루기보다 interruption-aware orchestration 계층과 함께 쓰라는 뜻이다.
+오늘날 `Ansible + 개별 Spot request`보다 `AWS Batch 또는 EC2 Fleet`가 더 자연스러운 첫 선택지인 이유는, 운영의 무게중심이 이미 인스턴스 생성보다 상위 계층으로 옮겨 갔기 때문이다. AWS 자체도 `RequestSpotInstances` API를 legacy API로 보고 강하게 권장하지 않는다 (AWS 2026e). 대신 Spot best practices는 EC2 Fleet, Auto Scaling, 통합 서비스, price-capacity-optimized 전략 같은 더 현대적인 요청 계층을 권한다 (AWS 2026d). 핵심 메시지는 이렇다. Spot을 쓰지 말라는 뜻이 아니라, Spot을 직접 원시 API 수준에서 다루기보다 interruption-aware orchestration 계층과 함께 쓰라는 뜻이다.
 
 EC2 Fleet는 직접 제어를 유지하면서도 다중 인스턴스 타입과 다중 서브넷, 다중 용량 풀을 하나의 요청으로 관리하게 해 준다. 자체 스케줄러를 가지고 있거나, 컨테이너보다 인스턴스 수준 제어를 더 중요하게 여기는 팀에게는 매우 유용하다. 반면 AWS Batch는 그 위에 잡 큐, array job, retry, timeout, 로그, Spot-backed compute environment를 얹어 주므로, 많은 연구실에게 더 높은 수준의 기본값이 된다. 쉽게 말해 Fleet는 `capacity orchestration`에 가깝고, Batch는 `job orchestration`에 가깝다. 실제 관심사가 "몇 대의 서버"보다 "몇 개의 반복 계산"에 있을 때는 후자가 더 자연스럽다.
 
@@ -80,7 +80,7 @@ Table 3. 짧은 독립 작업 shard 설계의 실전 원칙
 | child job 길이 | 대개 수 분 이상, 필요하면 10-20분 수준 | scheduler overhead를 줄이고 interruption recovery 단위를 적절히 유지 |
 | 상태 저장 | S3 manifest, 로그, 결과 파일에 남김 | 인스턴스 손실 시에도 진행 상태를 복원 가능 |
 | 실패 처리 | retry와 timeout을 분리 | stuck process와 일시적 실패는 성격이 다름 |
-| 작업 분배 | array index 기반 seed/range/param 분배 | 재실행 범위를 명확하게 제한 가능 |
+| 작업 분배 | array index 기반 seed/range/param 분배 | 재실행 범위 제한 가능 |
 
 ## Ansible은 어디에 남는가 - provisioning과 bootstrap
 

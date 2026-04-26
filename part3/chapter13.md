@@ -77,7 +77,7 @@ single-cell만으로는 충분하지 않다는 사실도 함께 배워야 한다
 
 여기서 Zarr만이 유일한 길이라고 가르치면 오히려 부정확해진다. CZ CELLxGENE Discover와 Census는 대규모 single-cell 데이터 접근을 위해 TileDB-SOMA를 사용한다. 이 선택은 Zarr가 틀렸다는 뜻이 아니라, tens of millions of cells 규모의 larger-than-memory 질의, cross-language API, 버전된 데이터 스냅샷, 더 엄격한 스키마 관리가 필요한 플랫폼에서는 상위 계층이 달라질 수 있음을 보여 준다. 교육적으로는 `AnnData + Zarr`를 연구자 친화적이고 scverse 중심의 경로로, `TileDB-SOMA`를 더 큰 규모의 플랫폼형 질의 계층으로 설명하는 편이 좋다. 즉 둘은 경쟁 관계라기보다 서로 다른 문제 규모에 대응하는 선택지에 가깝다.
 
-또한 CELLxGENE 플랫폼과 Census object를 구분하는 것도 중요하다. 개별 source dataset은 여전히 `h5ad`로 유통될 수 있지만, corpus-wide query 계층은 `TileDB-SOMA`로 제공된다. 학생이 이 점을 이해하면 "클라우드 네이티브 single-cell"이 반드시 하나의 형식만을 뜻하지 않는다는 사실을 자연스럽게 받아들일 수 있다. 결국 핵심은 특정 확장자에 대한 충성도가 아니라, 어떤 규모와 어떤 질의 패턴에 어떤 데이터 모델이 맞는지를 판단하는 능력이다.
+또한 CELLxGENE 플랫폼과 Census object를 구분하는 것도 중요하다. 개별 source dataset은 여전히 `h5ad`로 유통될 수 있지만, corpus-wide query 계층은 `TileDB-SOMA`로 제공된다. 학생이 이 점을 이해하면 "클라우드 네이티브 single-cell"이 늘 하나의 형식만을 뜻하지 않는다는 사실을 자연스럽게 받아들일 수 있다. 결국 핵심은 특정 확장자에 대한 충성도가 아니라, 어떤 규모와 어떤 질의 패턴에 어떤 데이터 모델이 맞는지를 판단하는 능력이다.
 
 ## AWS에서의 실전 운영 - S3, Batch, ECS/Fargate, SageMaker, Bedrock
 
@@ -87,9 +87,9 @@ AWS 관점에서 핵심은 결국 같다. 데이터를 S3에 두고, 필요한 �
 
 ## 한계와 주의점 - small objects, sharding, evolving APIs
 
-물론 Zarr와 클라우드 네이티브 접근에는 한계도 분명하다. chunk를 너무 잘게 쪼개면 small object가 급격히 늘고, request cost와 listing 비용이 커질 수 있다. zarr v3의 sharding은 이런 문제를 줄이기 위한 방향이지만, 실제 구현 세부는 계속 진화 중이다. AnnData 문서 기준 일부 기능은 아직 실험적 성격이 있으므로, 교과서에서는 세부 API보다 원리와 설계 감각을 남기는 편이 더 오래간다. 또한 같은 S3에 데이터를 올렸다고 해서 자동으로 빠르고 경제적인 구조가 되는 것은 아니다.
+물론 Zarr와 클라우드 네이티브 접근에는 한계도 있다. chunk를 너무 잘게 쪼개면 small object가 급격히 늘고, request cost와 listing 비용이 커질 수 있다. zarr v3의 sharding은 이런 문제를 줄이기 위한 방향이지만, 실제 구현 세부는 계속 진화 중이다. AnnData 문서 기준 일부 기능은 아직 실험적 성격이 있으므로, 교과서에서는 세부 API보다 원리와 설계 감각을 남기는 편이 더 오래간다. 또한 같은 S3에 데이터를 올렸다고 해서 자동으로 빠르고 경제적인 구조가 되는 것은 아니다.
 
-운영 감각도 함께 가르쳐야 한다. compute와 S3를 같은 region에 두는지, private VPC에서 S3 endpoint를 사용하는지, 고동시성 접근에서 `503 Slow Down` 같은 신호를 어떻게 모니터링하는지 같은 문제는 클라우드에서도 여전히 중요하다. Sonrai나 One BioSciences 같은 고객 사례의 시간 단축 수치는 학술 벤치마크가 아니라 사례 보고라는 점도 분명히 적어야 한다. `h5ad`를 버리자는 것이 아니라, 클라우드 시대의 single-cell과 spatial omics에서는 `전체 파일 중심 사고`에서 `부분 접근 중심 사고`, 나아가 `로컬 분석`에서 `재현 가능한 플랫폼 분석`으로 넘어가야 한다는 점이다.
+운영 감각도 함께 가르쳐야 한다. compute와 S3를 같은 region에 두는지, private VPC에서 S3 endpoint를 사용하는지, 고동시성 접근에서 `503 Slow Down` 같은 신호를 어떻게 모니터링하는지 같은 문제는 클라우드에서도 여전히 중요하다. Sonrai나 One BioSciences 같은 고객 사례의 시간 단축 수치는 학술 벤치마크가 아니라 사례 보고라는 점도 함께 적어야 한다. `h5ad`를 버리자는 것이 아니라, 클라우드 시대의 single-cell과 spatial omics에서는 `전체 파일 중심 사고`에서 `부분 접근 중심 사고`, 나아가 `로컬 분석`에서 `재현 가능한 플랫폼 분석`으로 넘어가야 한다는 점이다.
 
 ## 핵심 개념 정리
 
